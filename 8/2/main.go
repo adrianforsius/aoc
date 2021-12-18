@@ -21,18 +21,6 @@ func main() {
 		output := strings.Split(strings.TrimSpace(parts[1]), " ")
 		entrys = append(entrys, Entry{signal, output})
 	}
-	log.Println(entrys[:5])
-	// wires := make(map[int][]string)
-	// for _, entry := range entrys {
-	// 	for _, out := range entry.Output {
-	// 		s := len(out)
-	// 		if _, ok := wires[s]; !ok {
-	// 			wires[s] = []string{out}
-	// 		} else {
-	// 			wires[s] = append(wires[s], out)
-	// 		}
-	// 	}
-	// }
 
 	leds := map[string]int{
 		"a": -1,
@@ -59,8 +47,7 @@ func main() {
 		9: "",
 	}
 	count := 0
-	for eIdx, e := range entrys {
-		discovered := ""
+	for _, e := range entrys {
 		for _, word := range e.Signal {
 			if len(word) == 2 {
 				start[1] = word
@@ -76,8 +63,8 @@ func main() {
 			}
 		}
 		d, s := diff(start[1], start[7])
+
 		leds[d[0]] = 0
-		discovered += d[0]
 		for _, six := range ofSize(e.Signal, 6) {
 			_, s1 := diff(s[0], six)
 			_, s2 := diff(s[1], six)
@@ -86,6 +73,13 @@ func main() {
 			}
 		}
 
+		for _, five := range ofSize(e.Signal, 5) {
+			_, s1 := diff(s[0], five)
+			_, s2 := diff(s[1], five)
+			if len(s1) == 1 && len(s2) == 1 {
+				start[3] = five
+			}
+		}
 		for _, five := range filter(ofSize(e.Signal, 6), start[6]) {
 			_, s := diff(start[3], five)
 			if len(s) == len(start[3]) {
@@ -94,13 +88,6 @@ func main() {
 		}
 		start[0] = filter(filter(ofSize(e.Signal, 6), start[6]), start[9])[0]
 
-		for _, five := range filter(ofSize(e.Signal, 5), start[9]) {
-			_, s1 := diff(s[0], five)
-			_, s2 := diff(s[1], five)
-			if len(s1) == 1 && len(s2) == 1 {
-				start[3] = five
-			}
-		}
 		diff8and9, _ := diff(start[8], start[9])
 		for _, five := range filter(ofSize(e.Signal, 5), start[3]) {
 			_, s := diff(diff8and9[0], five)
@@ -112,27 +99,19 @@ func main() {
 		}
 		diff8and0, _ := diff(start[8], start[0])
 		leds[diff8and0[0]] = 3
-		discovered += diff8and0[0]
 		diff8and6, _ := diff(start[8], start[6])
 		leds[diff8and6[0]] = 2
-		discovered += diff8and6[0]
-		diff2andPos2 := filterStr(start[1], diff8and6[0])
-		leds[diff2andPos2] = 5
-		discovered += diff2andPos2
-		diff3andDisc, _ := diff(start[3], discovered)
+		diff2andPos2, _ := diff(start[1], diff8and6[0])
+		leds[diff2andPos2[0]] = 5
+		diff3andDisc, _ := diff(start[3], start[7]+diff8and0[0])
 		leds[diff3andDisc[0]] = 6
-		discovered += diff3andDisc[0]
-		diff9andDisc, _ := diff(start[9], discovered)
-		leds[diff9andDisc[0]] = 1
-		discovered += diff9andDisc[0]
-		diff8andDisc, _ := diff(start[8], discovered)
-		leds[diff8andDisc[0]] = 4
-
-		// log.Println("leds", leds, "start", start, discovered)
+		diff9andDisc, _ := diff(start[8], start[4]+d[0]+diff3andDisc[0])
+		leds[diff9andDisc[0]] = 4
+		diff8andDisc, _ := diff(start[8], start[3]+diff9andDisc[0])
+		leds[diff8andDisc[0]] = 1
 
 		digits := []string{}
-		log.Println(start, leds)
-		for i, word := range e.Output {
+		for _, word := range e.Output {
 			translated := []int{}
 			for _, letter := range word {
 				num, err := strconv.Atoi(fmt.Sprint(leds[string(letter)]))
@@ -144,28 +123,24 @@ func main() {
 
 			digit := ""
 			for num, o := range outcomes {
-				// log.Println("translated", translated, "o", o)
-				if equal(o, translated) {
-					// log.Println("equal", translated, o)
+				if equal(translated, o) {
 					digit = fmt.Sprint(num)
 				}
 			}
 			digits = append(digits, digit)
-			log.Println("eIdx", eIdx, "i", i, "word", word, digit)
 		}
-		log.Println("digits", digits)
 
 		num, err := strconv.Atoi(strings.Join(digits, ""))
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println("num", num)
 		count += num
 	}
 	log.Println("count", count)
 }
 
 func equal(a, b []int) bool {
+	log.Println("enter equal with a and b", a, b)
 	if len(a) != len(b) {
 		return false
 	}
@@ -177,22 +152,9 @@ func equal(a, b []int) bool {
 			}
 		}
 	}
+	log.Println("actual count", count, len(a))
 	return len(a) == count
 }
-
-// func match(a []int, b map[int][]int) int {
-// 	for _, B := range b {
-// 		count := 0
-// 		for _, A := range a {
-// 			if inInt(A, b) {
-// 				count += 1
-// 			}
-// 		}
-// 		if count == len(B) {
-
-// 		}
-// 	}
-// }
 
 func filterStr(entries string, f string) string {
 	out := ""
@@ -223,81 +185,6 @@ func ofSize(entries []string, size int) []string {
 	}
 	return out
 }
-
-// for outIdx, out := range wires {
-// 	for inIdx, in := range wires {
-// 		if outIdx == inIdx {
-// 			continue
-// 		}
-// 		cleanedIn := []string{}
-// 		cleanedOut := []string{}
-// 		for letter, found := range leds {
-// 			for _, i := range in {
-// 				if i == letter && found != -1 {
-// 					continue
-// 				}
-// 				cleanedIn = append(cleanedIn, i)
-// 			}
-// 			for _, o := range out {
-// 				if o == letter && found != -1 {
-// 					continue
-// 				}
-// 				cleanedOut = append(cleanedOut, o)
-// 			}
-// 		}
-
-// 		d := diff(in, out)
-// 		if len(d) == 1 {
-// 			if occurence[len(in)] == 1 && occurence[len(out)] == 1 {
-// 				pos := 0
-// 				for i := 0; i < 7; i++ {
-// 					if outcomes[len(in)][i] != outcomes[len(out)][i] {
-// 						pos = outcomes[len(in)][i]
-// 						if pos == 0 {
-// 							pos = outcomes[len(out)][i]
-// 						}
-// 					}
-// 				}
-// 				leds[d[0]] = pos
-// 			}
-// 		}
-// 	}
-// }
-// occurence := make(map[int]int)
-// for idx, o := range outcomes {
-// 	for _, line := range o {
-// 		if line == 1 {
-// 			if _, ok := occurence[idx]; !ok {
-// 				occurence[idx] = 1
-// 			} else {
-// 				occurence[idx] += 1
-// 			}
-// 		}
-// 	}
-// }
-
-// digits := make(map[int]int)
-// for len(digits) < 10 {
-// 	for outIdx, outVal := range outcomes {
-// 		for inIdx, inVal := range outcomes {
-// 			if outIdx == inIdx {
-// 				continue
-// 			}
-// 			d := outVal.Total - inVal.Total
-// 			if d < 0 {
-// 				d = -1 * d
-// 			}
-// 			if d == 1 {
-// 			}
-
-// 			if len(diff) == 1 {
-// 				for _, w := range wires {
-// 					if
-// 				}
-// 			}
-// 		}
-// 	}
-// }
 
 func diff(a string, b string) ([]string, []string) {
 	diffMap := make(map[string]int)
@@ -337,15 +224,6 @@ func in(a string, b string) bool {
 	return false
 }
 
-func inInt(a int, b []int) bool {
-	for _, B := range b {
-		if B == a {
-			return true
-		}
-	}
-	return false
-}
-
 var (
 	zero  = []int{0, 1, 2, 4, 5, 6}
 	one   = []int{2, 5}
@@ -353,24 +231,13 @@ var (
 	three = []int{0, 2, 3, 5, 6}
 	four  = []int{1, 2, 3, 5}
 	five  = []int{0, 1, 3, 5, 6}
-	six   = []int{0, 2, 3, 4, 5, 6}
+	six   = []int{0, 1, 3, 4, 5, 6}
 	seven = []int{0, 2, 5}
 	eight = []int{0, 1, 2, 3, 4, 5, 6}
-	nine  = []int{0, 1, 2, 3, 4, 6}
+	nine  = []int{0, 1, 2, 3, 5, 6}
 )
 
-// var (
-// s0 = []int{1, 1, 1, 0, 1, 1, 1}
-// s1 = []int{0, 0, 1, 0, 0, 1, 0}
-// s2 = []int{0, 0, 1, 1, 1, 0, 1}
-// s3 = []int{1, 0, 1, 1, 0, 1, 1}
-// s4 = []int{0, 1, 1, 1, 0, 1, 0}
-// s5 = []int{1, 1, 0, 1, 0, 1, 1}
-// s6 = []int{1, 0, 1, 1, 1, 1, 1}
-// s7 = []int{1, 0, 1, 0, 0, 1, 0}
-// s8 = []int{1, 1, 1, 1, 1, 1, 1}
-// s9 = []int{1, 1, 1, 1, 1, 0, 1}
-// )
+// var input = `acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf`
 
 var input = `bgafcde gfcd agc ebdgac adfceb bafeg efgca cgdfae cg ecadf | fabgced gc agc cdfg
 gbdacfe gcabfd cdb dcfba bfacg cgad fadeb feabcg cd gcbfed | bdagcef dcb cdag gbfca
