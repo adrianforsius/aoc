@@ -19,21 +19,13 @@ func main() {
 	for i := 1; i < len(template); i++ {
 		var one, two string
 		one, two = template[i-1], template[i]
-		if _, ok := pairs[one+two]; !ok {
-			pairs[one+two] = 1
-		} else {
-			pairs[one+two] += 1
-		}
+		pairs[one+two]++
 	}
 
 	result := make(map[string]int)
 	for i := 0; i < len(template); i++ {
 		letter := template[i]
-		if _, ok := result[letter]; !ok {
-			result[letter] = 1
-		} else {
-			result[letter] += 1
-		}
+		result[letter]++
 	}
 
 	log.Println(result)
@@ -42,23 +34,9 @@ func main() {
 		for pair, val := range pairs {
 			r, ok := rules[pair]
 			if ok {
-				if _, ok := newPairs[string(pair[0])+r]; !ok {
-					newPairs[string(pair[0])+r] = val
-				} else {
-					newPairs[string(pair[0])+r] += val
-				}
-
-				if _, ok := newPairs[r+string(pair[1])]; !ok {
-					newPairs[r+string(pair[1])] = val
-				} else {
-					newPairs[r+string(pair[1])] += val
-				}
-
-				if _, ok := result[r]; !ok {
-					result[r] = val
-				} else {
-					result[r] += val
-				}
+				newPairs[string(pair[0])+r] += val
+				newPairs[r+string(pair[1])] += val
+				result[r] += val
 			}
 			// if i < 3 {
 			// 	log.Println("result", result, newPairs)
