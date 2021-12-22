@@ -25,7 +25,6 @@ func main() {
 		for _, out := range entry.Output {
 			s := len(out)
 			if s == 2 || s == 3 || s == 4 || s == 7 {
-				log.Println("found", out)
 				count += 1
 			}
 		}
