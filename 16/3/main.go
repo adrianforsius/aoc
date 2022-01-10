@@ -1,88 +1,109 @@
 package main
 
-import (
-	"bytes"
-	"log"
-)
+// import (
+// 	"log"
+// 	"strconv"
+// 	"strings"
+// )
 
-func main() {
-	// lines := strings.Split(input, "\n")
-	// grid := [][]int{}
-	// for _, line := range lines {
-	// 	numLine := []int{}
-	// 	nums := strings.Split(line, "")
-	// 	for _, numStr := range nums {
-	// 		num, err := strconv.Atoi(numStr)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 		numLine = append(numLine, num)
-	// 	}
-	// 	grid = append(grid, numLine)
-	// }
+// type node struct {
+// 	pos []int
+// 	val int
+// }
 
-	grid := bytes.Fields([]byte(input))
+// func main() {
+// 	lines := strings.Split(input, "\n")
+// 	grid := [][]int{}
+// 	for _, line := range lines {
+// 		numLine := []int{}
+// 		nums := strings.Split(line, "")
+// 		for _, numStr := range nums {
+// 			num, err := strconv.Atoi(numStr)
+// 			if err != nil {
+// 				log.Fatal(err)
+// 			}
+// 			numLine = append(numLine, num)
+// 		}
+// 		grid = append(grid, numLine)
+// 	}
 
-	height := len(grid)
-	width := len(grid[0])
-	// distances
-	dist := make([][]int, height)
-	for i := range dist {
-		dist[i] = make([]int, width)
-		for j := range dist[i] {
-			dist[i][j] = 1e9
-		}
-	}
+// 	sum := 0
+// 	for _, line := range grid {
+// 		for _, num := range line {
+// 			sum += num
+// 		}
+// 	}
 
-	type point struct{ x, y int }
-	queues := make([][]point, (width+height)*9) // queue on max distance
+// 	queue := make([]node, 0)
+// 	FindPath(grid, &sum, 0, []node{{0, 0}})
+// 	log.Println("lowest", sum)
 
-	add := func(p point, d int) {
-		if p.x < 0 || p.y < 0 || p.x >= height || p.y >= width {
-			return
-		}
+// }
 
-		d += int(grid[p.x][p.y]) - '0'
-		if dist[p.x][p.y] <= d {
-			return
-		}
-		dist[p.x][p.y] = d
-		queues[d] = append(queues[d], p)
-	}
-	add(point{0, 0}, 0)
+// func FindPath(grid [][]int, x, y int, lowest *int, curr int, path []node) {
+// 	pos := []int{x, y}
+// 	val := grid[y][x]
+// 	curr += val
+// 	if curr > *lowest {
+// 		return
+// 	}
+// 	if x == len(grid)-1 && y == len(grid[0])-1 {
+// 		if curr < *lowest {
+// 			*lowest = curr
+// 			log.Println("walking", *lowest, curr)
+// 			showPath := path
+// 			if len(path) > 5 {
+// 				showPath = path[len(path)-5:]
+// 			}
+// 			log.Println(curr, showPath, *lowest)
+// 		}
+// 		return
+// 	}
+// 	path = append(path, node{pos, val})
 
-	// declare function in the same scope to get access to grid
-	visit := func(p point) {
-		d := dist[p.x][p.y]
-		if p.x == height-1 && p.y == width-1 {
-			log.Fatal(d)
-		}
-		add(point{p.x - 1, p.y}, d)
-		add(point{p.x + 1, p.y}, d)
-		add(point{p.x, p.y - 1}, d)
-		add(point{p.x, p.y + 1}, d)
-	}
+// 	// time.Sleep(time.Millisecond * 200)
+// 	left := []int{x - 1, y}
+// 	if x != 0 && !visited(left, path) {
+// 		FindPath(grid, left[0], left[1], lowest, curr, path)
+// 	}
 
-	for _, queue := range queues {
-		// log.Printf("queues %v", queues)
-		for _, point := range queue {
-			visit(point)
-		}
-	}
-}
+// 	right := []int{x + 1, y}
+// 	if x+1 < len(grid[0]) && !visited(right, path) {
+// 		FindPath(grid, right[0], right[1], lowest, curr, path)
+// 	}
 
-var input = `1163751742
-1381373672
-2136511328
-3694931569
-7463417111
-1319128137
-1359912421
-3125421639
-1293138521
-2311944581`
+// 	top := []int{x, y - 1}
+// 	if y != 0 && !visited(top, path) {
+// 		FindPath(grid, top[0], top[1], lowest, curr, path)
+// 	}
 
-// puzzle input
+// 	bottom := []int{x, y + 1}
+// 	if y+1 < len(grid) && !visited(bottom, path) {
+// 		FindPath(grid, bottom[0], bottom[1], lowest, curr, path)
+// 	}
+// }
+
+// func visited(pos []int, nodes []node) bool {
+// 	for _, p := range nodes {
+// 		if p.pos[0] == pos[0] && p.pos[1] == pos[1] {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
+
+// // var input = `1163751742
+// // 1381373672
+// // 2136511328
+// // 3694931569
+// // 7463417111
+// // 1319128137
+// // 1359912421
+// // 3125421639
+// // 1293138521
+// // 2311944581`
+
+// // puzzle input
 // var input = `9211721995398984823216199411311153152823357222811429112119221712176869272771135219495921176931988996
 // 6632171351773132146884416975191918371137224144193771793912898863217419114196131892432139894169918218
 // 9479521581911111241635179421411251317118763198279239927245149311971162612514425931183828668218451615

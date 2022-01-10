@@ -1,74 +1,186 @@
 package main
 
 import (
-	"bytes"
+	"container/heap"
 	"log"
+	"strconv"
+	"strings"
 )
 
+type node struct {
+	pos     []int
+	visited bool
+	weight  int
+	lowest  int
+	parent  *node
+	index   int
+}
+
 func main() {
-	// lines := strings.Split(input, "\n")
-	// grid := [][]int{}
-	// for _, line := range lines {
-	// 	numLine := []int{}
-	// 	nums := strings.Split(line, "")
-	// 	for _, numStr := range nums {
-	// 		num, err := strconv.Atoi(numStr)
-	// 		if err != nil {
-	// 			log.Fatal(err)
-	// 		}
-	// 		numLine = append(numLine, num)
+	lines := strings.Split(input, "\n")
+	grid := [][]node{}
+	for y, line := range lines {
+		numLine := []node{}
+		nums := strings.Split(line, "")
+		for x, numStr := range nums {
+			num, err := strconv.Atoi(numStr)
+			if err != nil {
+				log.Fatal(err)
+			}
+			numLine = append(numLine, node{[]int{y, x}, false, num, 1e9, nil, 0})
+		}
+		grid = append(grid, numLine)
+	}
+	// log.Println(paths, len(grid[0]), len(grid))
+	// sum := 0
+	// for _, line := range grid {
+	// 	for _, node := range line {
+	// 		sum += node.weight
 	// 	}
-	// 	grid = append(grid, numLine)
 	// }
 
-	grid := bytes.Fields([]byte(input))
+	// paths := make(map[string]Track)
+	// weight := sum / (len(grid) * len(grid[0]))
+	// log.Println("weight", weight, "len", len(grid)*len(grid[0]))
+	// grid[0][0].visited = true
+	// grid[0][0].track = Track{
+	// 	nodes: []node{
+	// 		{pos: []int{0, 0}},
+	// 	},
+	// }
 
-	height := len(grid)
-	width := len(grid[0])
-	// distances
-	dist := make([][]int, height)
-	for i := range dist {
-		dist[i] = make([]int, width)
-		for j := range dist[i] {
-			dist[i][j] = 1e9
+	pq := make(PriorityQueue, 0)
+	q := &pq
+	heap.Init(q)
+	heap.Push(q, &grid[0][0])
+	FindPath(&grid, q)
+	log.Print(grid[9][9].parent.parent, grid[9][9])
+	// log.Println("visited", visited(grid), "track", len(grid[9][9].track.nodes))
+	// count := 0
+	// for _, n := range grid[9][9].track.nodes {
+	// 	log.Println("node", n.pos[0], n.pos[1])
+	// log.Printf("coords %s, count %d m %d weight", coords, count, m.weight)
+	// }
+	// log.Println("lowest", paths["100,100"].nodes, paths["100,100"].weight)
+	// log.Println("lowest", paths["50,50"].nodes, paths["50,50"].weight)
+	// log.Println("lowest", paths["0,0"].nodes, paths["0,0"].weight)
+	for _, row := range grid {
+		var parents [][]int
+		for _, col := range row {
+			if col.parent == nil {
+				continue
+			}
+			parents = append(parents, []int{col.parent.pos[0], col.parent.pos[1]})
 		}
+		log.Println(parents)
 	}
 
-	type point struct{ x, y int }
-	queues := make([][]point, (width+height)*9) // queue on max distance
+}
 
-	add := func(p point, d int) {
-		if p.x < 0 || p.y < 0 || p.x >= height || p.y >= width {
-			return
-		}
+// func visited(nodes [][]node) int {
+// 	count := 0
+// 	for _, line := range nodes {
+// 		for _, n := range line {
+// 			if n.visited {
+// 				count++
+// 			}
+// 		}
+// 	}
+// 	return count
+// }
 
-		d += int(grid[p.x][p.y]) - '0'
-		if dist[p.x][p.y] <= d {
-			return
-		}
-		dist[p.x][p.y] = d
-		queues[d] = append(queues[d], p)
-	}
-	add(point{0, 0}, 0)
-
-	// declare function in the same scope to get access to grid
-	visit := func(p point) {
-		d := dist[p.x][p.y]
-		if p.x == height-1 && p.y == width-1 {
-			log.Fatal(d)
-		}
-		add(point{p.x - 1, p.y}, d)
-		add(point{p.x + 1, p.y}, d)
-		add(point{p.x, p.y - 1}, d)
-		add(point{p.x, p.y + 1}, d)
+func FindPath(g *[][]node, q *PriorityQueue) {
+	grid := *g
+	if len(*q) == 0 {
+		return
 	}
 
-	for _, queue := range queues {
-		// log.Printf("queues %v", queues)
-		for _, point := range queue {
-			visit(point)
-		}
+	n := *q.Pop().(*node)
+	y, x := n.pos[0], n.pos[1]
+	// log.Println("x/y", x, y)
+	// if grid[y][x].visited {
+	// 	FindPath(&grid, q)
+	// 	return
+	// }
+	grid[y][x].visited = true
+
+	queue := make([]node, 0)
+	if x != 0 {
+		queue = append(queue, grid[y][x-1])
 	}
+
+	if x+1 < len(grid[0]) {
+		queue = append(queue, grid[y][x+1])
+	}
+
+	if y != 0 {
+		queue = append(queue, grid[y-1][x])
+	}
+
+	if y+1 < len(grid) {
+		queue = append(queue, grid[y+1][x])
+	}
+
+	// log.Println("node", n, "x", x, "y", y, "q", q.Len(), "node lowest", n.lowest, "node parent", n.parent)
+	// log.Println("queue", len(queue))
+	// time.Sleep(time.Millisecond * 200)
+	for _, neigboor := range queue {
+		next := grid[neigboor.pos[0]][neigboor.pos[1]]
+		if next.visited {
+			continue
+		}
+		if next.parent == nil || next.weight+grid[y][x].lowest < next.lowest {
+			// next.parent = &n.pos
+			// next.lowest = n.lowest + next.weight
+			grid[neigboor.pos[0]][neigboor.pos[1]].parent = &n
+			grid[neigboor.pos[0]][neigboor.pos[1]].lowest = grid[y][x].lowest + next.weight
+			if x < 3 && y < 3 {
+				log.Println(x, y, grid[y][x].lowest)
+			}
+			// log.Println("setting new values", next.parent, next.lowest)
+		}
+		// log.Println("push node", neigboor.pos[0], neigboor.pos[1])
+		heap.Push(q, &next)
+		// heap.Fix(q, len(*q)-1)
+	}
+
+	// for _, item := range *q {
+	// 	log.Printf("quque %v", item)
+	// }
+	FindPath(&grid, q)
+}
+
+// A PriorityQueue implements heap.Interface and holds Items.
+type PriorityQueue []*node
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	// We want Pop to give us the highest, not lowest, priority so we use greater than here.
+	return pq[i].lowest > pq[j].lowest
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+	pq[i].index = i
+	pq[j].index = j
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	n := len(*pq)
+	item := x.(*node)
+	item.index = n
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil  // avoid memory leak
+	item.index = -1 // for safety
+	*pq = old[0 : n-1]
+	return item
 }
 
 var input = `1163751742
