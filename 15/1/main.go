@@ -1,95 +1,120 @@
 package main
 
 import (
+	"container/heap"
 	"log"
 	"strconv"
 	"strings"
 )
 
 type node struct {
-	pos []int
-	val int
+	pos     []int
+	visited bool
+	weight  int
+	lowest  int
+	parent  *node
 }
 
 func main() {
 	lines := strings.Split(input, "\n")
-	grid := [][]int{}
-	for _, line := range lines {
-		numLine := []int{}
+	grid := [][]node{}
+	for y, line := range lines {
+		numLine := []node{}
 		nums := strings.Split(line, "")
-		for _, numStr := range nums {
+		for x, numStr := range nums {
 			num, err := strconv.Atoi(numStr)
 			if err != nil {
 				log.Fatal(err)
 			}
-			numLine = append(numLine, num)
+			numLine = append(numLine, node{[]int{y, x}, false, num, num, nil})
 		}
 		grid = append(grid, numLine)
 	}
-	// paths := make([][]node, 0)
-	// log.Println(paths, len(grid[0]), len(grid))
-	sum := 0
-	for _, line := range grid {
-		for _, num := range line {
-			sum += num
-		}
-	}
+	pq := make(PriorityQueue, 0)
+	q := &pq
+	heap.Init(q)
+	heap.Push(q, &grid[0][0])
+	grid = FindPath(grid, q)
 
-	FindPath(grid, 0, 0, &sum, 0, []node{})
-	log.Println("lowest", sum)
-
+	log.Println(grid[99][99].lowest - grid[0][0].lowest)
 }
 
-func FindPath(grid [][]int, x, y int, lowest *int, curr int, path []node) {
-	pos := []int{x, y}
-	val := grid[y][x]
-	curr += val
-	if curr > *lowest {
-		return
-	}
-	if x == len(grid)-1 && y == len(grid[0])-1 {
-		if curr < *lowest {
-			*lowest = curr
-			log.Println("walking", *lowest, curr)
-			showPath := path
-			if len(path) > 5 {
-				showPath = path[len(path)-5:]
-			}
-			log.Println(curr, showPath, *lowest)
-		}
-		return
-	}
-	path = append(path, node{pos, val})
-
-	// time.Sleep(time.Millisecond * 200)
-	left := []int{x - 1, y}
-	if x != 0 && !visited(left, path) {
-		FindPath(grid, left[0], left[1], lowest, curr, path)
-	}
-
-	right := []int{x + 1, y}
-	if x+1 < len(grid[0]) && !visited(right, path) {
-		FindPath(grid, right[0], right[1], lowest, curr, path)
-	}
-
-	top := []int{x, y - 1}
-	if y != 0 && !visited(top, path) {
-		FindPath(grid, top[0], top[1], lowest, curr, path)
-	}
-
-	bottom := []int{x, y + 1}
-	if y+1 < len(grid) && !visited(bottom, path) {
-		FindPath(grid, bottom[0], bottom[1], lowest, curr, path)
+func printParents(n node, count *int) {
+	log.Println(n, "count", count)
+	if n.parent != nil {
+		*count++
+		printParents(*n.parent, count)
 	}
 }
 
-func visited(pos []int, nodes []node) bool {
-	for _, p := range nodes {
-		if p.pos[0] == pos[0] && p.pos[1] == pos[1] {
-			return true
-		}
+func FindPath(grid [][]node, q *PriorityQueue) [][]node {
+	if q.Len() == 0 {
+		return grid
 	}
-	return false
+
+	n := heap.Pop(q).(*node)
+	y, x := n.pos[0], n.pos[1]
+	if grid[y][x].visited {
+		return FindPath(grid, q)
+	}
+
+	grid[y][x].visited = true
+	queue := make([]node, 0)
+	if x != 0 {
+		queue = append(queue, grid[y][x-1])
+	}
+
+	if x+1 < len(grid[0]) {
+		queue = append(queue, grid[y][x+1])
+	}
+
+	if y != 0 {
+		queue = append(queue, grid[y-1][x])
+	}
+
+	if y+1 < len(grid) {
+		queue = append(queue, grid[y+1][x])
+	}
+
+	for _, neigboor := range queue {
+		next := grid[neigboor.pos[0]][neigboor.pos[1]]
+		if next.visited {
+			continue
+		}
+		if next.parent == nil || grid[y][x].lowest+next.weight < next.lowest {
+			grid[neigboor.pos[0]][neigboor.pos[1]].parent = &grid[y][x]
+			grid[neigboor.pos[0]][neigboor.pos[1]].lowest = next.weight + grid[y][x].lowest
+		}
+		heap.Push(q, &grid[neigboor.pos[0]][neigboor.pos[1]])
+	}
+	return FindPath(grid, q)
+}
+
+// A PriorityQueue implements heap.Interface and holds Items.
+type PriorityQueue []*node
+
+func (pq PriorityQueue) Len() int { return len(pq) }
+
+func (pq PriorityQueue) Less(i, j int) bool {
+	return pq[i].lowest < pq[j].lowest
+}
+
+func (pq PriorityQueue) Swap(i, j int) {
+	pq[i], pq[j] = pq[j], pq[i]
+}
+
+func (pq *PriorityQueue) Push(x interface{}) {
+	item := x.(*node)
+	*pq = append(*pq, item)
+}
+
+func (pq *PriorityQueue) Pop() interface{} {
+	old := *pq
+	n := len(old)
+	item := old[n-1]
+	old[n-1] = nil // avoid memory leak
+	*pq = old[:n-1]
+	return item
 }
 
 // var input = `1163751742

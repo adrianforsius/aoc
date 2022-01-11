@@ -30,47 +30,109 @@ func main() {
 		}
 		grid = append(grid, numLine)
 	}
+
+	newGrid := make([][]node, len(grid)*5)
+	for i := 0; i < len(newGrid); i++ {
+		newGrid[i] = make([]node, len(grid)*5)
+	}
+	// n := len(grid)
+	log.Println("size", len(newGrid[0]))
+	log.Println("size", len(newGrid[len(newGrid)-1]))
+	n := len(grid)
+	for i := 0; i < 5*n; i++ {
+		for j := 0; j < 5*n; j++ {
+			newGrid[i][j] = node{
+				weight: grid[i%n][j%n].weight,
+				pos:    []int{i, j},
+			}
+		}
+	}
+	// for _, row := range newGrid {
+	// 	// log.Println(row)
+	// 	vals := []int{}
+	// 	for _, val := range row {
+	// 		vals = append(vals, val.weight)
+	// 	}
+	// 	log.Println(vals)
+	// }
+
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 5; j++ {
+			for y := 0; y < n; y++ {
+				for x := 0; x < n; x++ {
+					newGrid[i*n+y][j*n+x].weight = (newGrid[i*n+y][j*n+x].weight+i+j-1)%9 + 1
+				}
+			}
+		}
+	}
+
+	// log.Println("===================")
+	// for _, row := range newGrid {
+	// 	// log.Println(row)
+	// 	vals := []int{}
+	// 	for _, val := range row {
+	// 		vals = append(vals, val.weight)
+	// 	}
+	// 	log.Println(vals)
+	// }
+
+	// for i := 0; i < 5; i++ {
+	// 	for j := 0; j < 5; j++ {
+	// 		for row := 0; row < len(grid); row++ {
+	// 			for col := 0; col < len(grid[0]); col++ {
+	// 				highest := i
+	// 				if j > i {
+	// 					highest = j
+	// 				}
+	// 				x := col + j*len(grid)
+	// 				y := row + i*len(grid)
+	// 				if y < 3 && x < 3 {
+	// 					log.Println(row, col, grid[col][row].weight)
+	// 				}
+
+	// 				newGrid[y][x] = grid[col][row]
+	// 				newGrid[y][x].weight = newGrid[y][x].weight + highest
+	// 				newGrid[y][x].weight = newGrid[y][x].weight % 9
+	// 				if newGrid[y][x].weight == 0 {
+	// 					newGrid[y][x].weight = 1
+	// 				}
+	// 				newGrid[y][x].pos[0] = y
+	// 				newGrid[y][x].pos[1] = x
+	// 				// log.Printf("row %d col %d, n %+v, %d, %d", i, j, newGrid[y][x], row, col)
+	// 			}
+	// 		}
+	// 	}
+	// }
+
 	pq := make(PriorityQueue, 0)
 	q := &pq
 	heap.Init(q)
-	heap.Push(q, &grid[0][0])
-	grid = FindPath(grid, q)
-
-	// log.Println("================", grid[9][9])
-	// count := printParents(grid[99][99], 0)
-	log.Println("================", grid[99][99].lowest)
-	log.Println(grid[99][99].lowest - grid[0][0].lowest)
-	// for _, row := range grid {
-	// 	var parents [][]int
-	// 	for _, col := range row {
-	// 		if col.parent == nil {
-	// 			continue
-	// 		}
-	// 		parents = append(parents, []int{col.parent.pos[0], col.parent.pos[1]})
+	heap.Push(q, &newGrid[0][0])
+	newGrid = FindPath(newGrid, q)
+	// for _, row := range newGrid {
+	// 	// log.Println(row)
+	// 	vals := []int{}
+	// 	for _, val := range row {
+	// 		vals = append(vals, val.weight)
 	// 	}
-	// 	log.Println(parents)
+	// 	log.Println(vals)
 	// }
 
+	log.Println(newGrid[len(newGrid)-1][len(newGrid)-1].lowest)
 }
 
-// func printParents(n node, count int) int {
-// 	log.Println(n, "count", count)
-// 	if n.parent != nil {
-// 		return printParents(*n.parent, n.lowest+count)
-// 	}
-// 	return count
-// }
+func printParents(n node, count *int) {
+	// log.Println(n, "count", count)
+	if n.parent != nil {
+		*count++
+		printParents(*n.parent, count)
+	}
+}
 
 func FindPath(grid [][]node, q *PriorityQueue) [][]node {
 	if q.Len() == 0 {
 		return grid
 	}
-
-	// peek := []*node(*q)[len(*q)-1]
-	// log.Printf("node %+v", peek)
-	// for _, i := range *q {
-	// 	log.Printf("queue %+v", i)
-	// }
 
 	n := heap.Pop(q).(*node)
 	y, x := n.pos[0], n.pos[1]
@@ -96,12 +158,14 @@ func FindPath(grid [][]node, q *PriorityQueue) [][]node {
 		queue = append(queue, grid[y+1][x])
 	}
 
+	// log.Printf("queue %+v", queue)
 	for _, neigboor := range queue {
+		// log.Printf("next %+v, %+v", neigboor, n)
 		next := grid[neigboor.pos[0]][neigboor.pos[1]]
 		if next.visited {
 			continue
 		}
-		if next.parent == nil || next.parent != nil && grid[y][x].lowest+next.weight < next.lowest {
+		if next.parent == nil || grid[y][x].lowest+next.weight < next.lowest {
 			grid[neigboor.pos[0]][neigboor.pos[1]].parent = &grid[y][x]
 			grid[neigboor.pos[0]][neigboor.pos[1]].lowest = next.weight + grid[y][x].lowest
 		}
