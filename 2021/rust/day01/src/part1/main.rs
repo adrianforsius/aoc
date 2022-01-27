@@ -1,16 +1,16 @@
+#![feature(array_windows)]
 
 fn main() {
-    let split: Vec<&str> = INPUT.split("\n").collect();
-    // for (idx, s) in split.iter().enumerate() {
-    //     println!("{} - {}", idx, s);
+    let split: Vec<u32> = INPUT.split("\n").map(|x| x.parse::<u32>().unwrap()).collect();
+
+    // for i in 1..split.len() {
+    //     if split[i-1] < split[i] {
+    //         count = count + 1
+    //     }
+    //     iter += 1
     // }
-    let mut count = 0;
-    for i in 0..split.len()-1 {
-        if split[i] < split[i+1] {
-            count += 1
-        }
-    }
-    println!("{}", count)
+    println!("{}", split.array_windows().filter(|[a,b]| a < b).count())
+
 }
 
 // static INPUT: &str = "199
