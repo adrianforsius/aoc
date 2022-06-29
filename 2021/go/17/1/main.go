@@ -29,26 +29,34 @@ func onTarget(pos point, target coord) bool {
 }
 
 func try(target coord) (point, bool) {
-	velocity := point{0, 0}
-	for {
-		currentPos := point{0, 0}
-		currVelocity := velocity
+	maxStepDistance := target.yEnd*-1 - 1
+
+	fmt.Println("step max", maxStepDistance)
+	for x := 0; ; x++ {
+		maxHeight := 0
+		startPos := point{0, 0}
+		startVelocity := point{x, maxStepDistance}
+		currentPos := startPos
+		currVelocity := startVelocity
 		for {
 			currVelocity, currentPos = pos(currVelocity, currentPos)
+
+			fmt.Println("velocity", currVelocity, "pos", currentPos)
+			if currentPos.y > maxHeight {
+				maxHeight = currentPos.y
+			}
+
 			if onTarget(currentPos, target) {
-				return currentPos, true
+				fmt.Println("max height", maxHeight)
+				return startVelocity, true
 			}
 
 			if currentPos.x > target.xEnd {
-				velocity.y++
 				break
 			}
-
 			if currentPos.y < target.yEnd {
-				velocity.x++
 				break
 			}
-			fmt.Println("velocity", velocity, "pos", currentPos)
 		}
 	}
 }
@@ -66,4 +74,6 @@ type coord struct {
 }
 
 // puzzle input
-var input = coord{281, 311, 74, -54}
+// var input = coord{20, 30, -5, -10}
+
+var input = coord{281, 311, -54, -74}
