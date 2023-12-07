@@ -1,21 +1,20 @@
-import os
 from unittest import TestCase
 
-from input.file import test_input, input
 from day01.second.main import second
+from input.file import input
 
-path = os.path.abspath(os.path.dirname(__file__))
+example_input = input("input.txt")
+daily_input = input("../input.txt")
+
 
 class TestMain(TestCase):
-
     def test_example(self):
-        data = test_input(path)
-        out = second(data)
+        out = second(example_input)
 
         self.assertEqual([29, 83, 13, 24, 42, 14, 76], out)
 
     def test_with_input(self):
-        data = input(path)
+        data = input(daily_input)
         out = second(data)
 
         self.assertEqual(53340, sum(out))
