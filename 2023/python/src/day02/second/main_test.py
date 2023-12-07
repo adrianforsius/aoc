@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from day01.second.main import second
+from day02.second.main import second
 from input.file import input
 
 example_input = input("input.txt")
