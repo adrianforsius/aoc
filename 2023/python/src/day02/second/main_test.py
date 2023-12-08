@@ -11,10 +11,9 @@ class TestMain(TestCase):
     def test_example(self):
         out = second(example_input)
 
-        self.assertEqual([], out)
+        self.assertEqual(2286, out)
 
     def test_with_input(self):
-        data = input(daily_input)
-        out = second(data)
+        out = second(daily_input)
 
-        self.assertEqual(0, sum(out))
+        self.assertEqual(72970, out)
