@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from day01.second.main import second
+from day03.second.main import second
 from input.file import input
 
 example_input = input("input.txt")
@@ -11,10 +11,9 @@ class TestMain(TestCase):
     def test_example(self):
         out = second(example_input)
 
-        self.assertEqual([], out)
+        self.assertEqual(467835, out)
 
     def test_with_input(self):
-        data = input(daily_input)
-        out = second(data)
+        out = second(daily_input)
 
-        self.assertEqual(0, sum(out))
+        self.assertEqual(0, out)
