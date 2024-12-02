@@ -9,11 +9,11 @@ import (
 func TestDay2Example(t *testing.T) {
 	left, right := []int{}, []int{}
 	const output = 0
-	assert.Equal(t, Day2(left, right), output)
+	assert.Equal(t, output, Day2(left, right))
 }
 
 func TestDay2(t *testing.T) {
 	left, right := []int{}, []int{}
 	const output = 0
-	assert.Equal(t, Day2(left, right), output)
+	assert.Equal(t, output, Day2(left, right))
 }
