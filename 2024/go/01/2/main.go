@@ -1,31 +1,40 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
 
-const input = `
-`
-
-func main() {
-	lines := strings.Split("\n", input)
-
-	left, right := []int{}, []int{}
+func Parse(input string) (map[int]int, map[int]int) {
+	lines := strings.Split(input, "\n")
+	left, right := make(map[int]int, 0), make(map[int]int, 0)
 	for _, line := range lines {
-		parts := strings.Split(" ", line)
+		parts := strings.Split(line, "   ")
+
 		leftNum, _ := strconv.Atoi(strings.TrimSpace(parts[0]))
-		left = append(left, leftNum)
+		if _, ok := left[leftNum]; !ok {
+			left[leftNum] = 1
+		} else {
+			left[leftNum] += 1
+		}
 
 		rightNum, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
-		right = append(right, rightNum)
+		if _, ok := right[rightNum]; !ok {
+			right[rightNum] = 1
+		} else {
+			right[rightNum] += 1
+		}
 	}
-
-	out := Day2(left, right)
-	fmt.Println("out", out)
+	return left, right
 }
 
-func Day2(left, right []int) int {
-	return 0
+func Day2(left, right map[int]int) int {
+	sum := 0
+	for key, val := range left {
+		if rightVal, ok := right[key]; ok {
+			sum += key * val * rightVal
+		}
+	}
+
+	return sum
 }

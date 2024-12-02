@@ -7,13 +7,15 @@ import (
 )
 
 func TestDay2Example(t *testing.T) {
-	left, right := []int{}, []int{}
-	const output = 0
+	left, right := Parse(exampleInput)
+
+	const output = 31
 	assert.Equal(t, output, Day2(left, right))
 }
 
 func TestDay2(t *testing.T) {
-	left, right := []int{}, []int{}
+	left, right := Parse(input)
+
 	const output = 0
 	assert.Equal(t, output, Day2(left, right))
 }
