@@ -20,61 +20,54 @@ func Parse(input string) [][]int {
 	return reportCard
 }
 
-func asc(levels []int) bool {
-	lifeline := 1
-	for i, j := 0, 1; j < len(levels); i, j = i+1, j+1 {
-		curr, next := levels[i], levels[j]
-		if next <= curr || next >= curr+4 {
-			if j+1 >= len(levels) {
-				return false
-			}
-			curr, next := levels[i], levels[j+1]
-			if next <= curr || next >= curr+4 {
-				return false
-			}
-			i = j
-			j = j + 1
-			lifeline--
-		}
-		if lifeline < 0 {
-			return false
-		}
-	}
-
-	return true
+func isAsc(curr, next int) bool {
+	return next > curr && next < curr+4
 }
 
-func desc(levels []int) bool {
-	lifeline := 1
+func isDesc(curr, next int) bool {
+	return next < curr && next > curr-4
+}
+
+func asc(levels []int) int {
+	points := 0
 	for i, j := 0, 1; j < len(levels); i, j = i+1, j+1 {
-		curr, next := levels[i], levels[j]
-		if next >= curr || next <= curr-4 {
-			if j+1 >= len(levels) {
-				return false
-			}
-			curr, next := levels[i], levels[j+1]
-			if next >= curr || next <= curr-4 {
-				return false
-			}
-			i = j
-			j = j + 1
-			lifeline--
-			i--
-		}
-		if lifeline < 0 {
-			return false
+		if isAsc(levels[i], levels[j]) {
+			points++
 		}
 	}
-	return true
+	return points
+}
+
+func desc(levels []int) int {
+	points := 0
+	for i, j := 0, 1; j < len(levels); i, j = i+1, j+1 {
+		if isDesc(levels[i], levels[j]) {
+			points++
+		}
+	}
+	return points
 }
 
 func Day2(reportCard [][]int) int {
 	safe := 0
 	for _, levels := range reportCard {
-		if asc(levels) || desc(levels) {
-			safe++
+		for i := 0; i < len(levels); i++ {
+			ss := make([]int, len(levels))
+			copy(ss, levels)
+			s := remove(ss, i)
+			ascPoints := asc(s)
+			descPoints := desc(s)
+			if ascPoints >= len(s)-1 || descPoints >= len(s)-1 {
+				safe++
+				break
+			}
+			// fmt.Println("break", s, ascPoints, descPoints)
 		}
 	}
 
 	return safe
+}
+
+func remove(slice []int, s int) []int {
+	return append(slice[:s], slice[s+1:]...)
 }
