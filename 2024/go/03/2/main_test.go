@@ -16,6 +16,6 @@ func TestDay2Example(t *testing.T) {
 func TestDay2(t *testing.T) {
 	output := Parse(input)
 
-	const expected = 0
+	const expected = 111762583
 	assert.Equal(t, expected, Day2(output))
 }

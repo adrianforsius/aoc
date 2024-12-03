@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -13,9 +12,8 @@ func Parse(in string) string {
 
 func Day1(in string) int {
 	r := regexp.MustCompile(`mul\([0-9]+,[0-9]+\)`)
-	// r := regexp.MustCompile(`mul\(`)
-	fmt.Println(in)
 	muls := r.FindAllString(in, -1)
+
 	score := 0
 	for _, m := range muls {
 		ss := strings.Split(m, "mul(")
