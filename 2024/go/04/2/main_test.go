@@ -9,13 +9,13 @@ import (
 func TestDay2Example(t *testing.T) {
 	output := Parse(exampleInput)
 
-	const expected = 48
+	const expected = 9
 	assert.Equal(t, expected, Day2(output))
 }
 
 func TestDay2(t *testing.T) {
 	output := Parse(input)
 
-	const expected = 111762583
+	const expected = 0
 	assert.Equal(t, expected, Day2(output))
 }

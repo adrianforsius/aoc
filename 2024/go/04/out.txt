@@ -1,0 +1,13 @@
+=== RUN   TestDay2Example
+--- PASS: TestDay2Example (0.00s)
+=== RUN   TestDay2
+    main_test.go:20: 
+        	Error Trace:	/home/adrianforsius/src/github.com/adrianforsius/aoc/2024/go/04/2/main_test.go:20
+        	Error:      	Not equal: 
+        	            	expected: 0
+        	            	actual  : 1854
+        	Test:       	TestDay2
+--- FAIL: TestDay2 (0.00s)
+FAIL
+FAIL	github.com/adrianforsius/aoc/2024/go/04/2	0.003s
+FAIL
