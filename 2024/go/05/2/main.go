@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -30,8 +31,29 @@ func Parse(in string) ([]Rule, [][]int) {
 	return rules, pages
 }
 
+type Rule struct {
+	Before int
+	After  int
+}
+
 type RuleSet struct {
 	rules []Rule
+}
+
+func (r RuleSet) Correct(page []int) []int {
+	out := []int{page[0]}
+	for _, p := range page[1:] {
+		afterIndex := 0
+		for i, v := range out {
+			for _, rule := range r.rules {
+				if rule.After == p && rule.Before == v {
+					afterIndex = i + 1
+				}
+			}
+		}
+		out = slices.Insert(out, afterIndex, p)
+	}
+	return out
 }
 
 func (r RuleSet) Valid(num int, after map[int]int) bool {
@@ -59,46 +81,25 @@ func mapSet(m map[int]int) bool {
 	return true
 }
 
-type Rule struct {
-	Before int
-	After  int
-}
-
-func Day1(rules []Rule, pages [][]int) int {
+func Day2(rules []Rule, pages [][]int) int {
 	score := 0
+	set := RuleSet{rules}
 	for _, page := range pages {
 		valid := true
 		for i := 0; i < len(page); i++ {
 			after := map[int]int{}
-			if i+i < len(page) {
+			if i+1 < len(page) {
 				for _, a := range page[i+1:] {
 					after[a] = 0
 				}
 			}
 
-			num := page[i]
-
-			for _, rule := range rules {
-				if rule.Before == num {
-					if _, ok := after[rule.After]; ok {
-						after[rule.After] = 1
-					}
-				}
-				if _, ok := after[rule.Before]; ok {
-					if rule.After == num {
-						valid = false
-					}
-				}
-			}
 			if valid {
-				for _, a := range after {
-					if a == 0 {
-						valid = false
-					}
-				}
+				valid = set.Valid(page[i], after)
 			}
 		}
-		if valid {
+		if !valid {
+			page = set.Correct(page)
 			score += page[len(page)/2]
 		}
 	}
