@@ -2,76 +2,91 @@ package main
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
 )
 
-type Point struct {
-	X int
-	Y int
+func Parse(in string) []int {
+	line := []int{}
+	for _, char := range strings.Split(in, "") {
+		num, _ := strconv.Atoi(char)
+		line = append(line, num)
+	}
+	return line
 }
 
-type Grid struct {
-	grid    [][]string
-	letters map[string][]Point
-}
-
-func (g Grid) Print(m map[Point]int) {
-	for y, row := range g.grid {
-		for x, v := range row {
-			if _, ok := m[Point{x, y}]; ok {
-				fmt.Print("#")
+func toString(line []int) []string {
+	count := 0
+	display := []string{}
+	file := true
+	for _, num := range line {
+		for i := 0; i < num; i++ {
+			if file {
+				display = append(display, fmt.Sprint(count))
 			} else {
-				fmt.Print(v)
+				display = append(display, ".")
 			}
 		}
-		fmt.Println()
+		if file {
+			count++
+		}
+		file = !file
 	}
+	return display
 }
 
-func Parse(in string) Grid {
-	grid := [][]string{}
-	letters := map[string][]Point{}
-	for y, line := range strings.Split(in, "\n") {
-		chars := strings.Split(line, "")
-		grid = append(grid, chars)
-		for x, char := range chars {
-			if char == "." {
-				continue
-			}
-			if _, ok := letters[char]; ok {
-				letters[char] = append(letters[char], Point{x, y})
+func Day2(line []int) int {
+	blocks := toString(line)
+
+	for i := len(blocks) - 1; i > 0; i-- {
+		if blocks[i] == "." {
+			continue
+		}
+
+		char := blocks[i]
+		fileFrom := i
+		fileTo := i
+		for fileTo > 0 && blocks[fileTo] == char {
+			fileTo--
+		}
+		i = fileTo + 1
+		fileSize := fileFrom - fileTo
+
+		blockFrom := slices.IndexFunc(blocks, func(s string) bool {
+			return s != "."
+		})
+		blockTo := blockFrom
+		for k := blockFrom; k < len(blocks)-1; k++ {
+			if blocks[k] == "." {
+				blockTo++
 			} else {
-				letters[char] = []Point{{x, y}}
+				blockFrom = k
+				blockTo = k
+			}
+			if blockTo-blockFrom == fileSize {
+				break
+			}
+		}
+		if fileTo < blockTo {
+			continue
+		}
+
+		if blockTo-blockFrom == fileSize {
+			for f := 0; f < fileSize; f++ {
+				blocks[blockFrom+1] = blocks[fileTo+1]
+				blocks[fileTo+1] = "."
+				blockFrom++
+				fileTo++
 			}
 		}
 	}
-	return Grid{grid, letters}
-}
 
-func Day2(grid Grid) int {
-	sum := map[Point]int{}
-	for i := range grid.letters {
-		for _, curr := range grid.letters[i] {
-			for _, next := range grid.letters[i] {
-				if curr == next {
-					continue
-				}
-				dx := curr.X - next.X
-				dy := curr.Y - next.Y
-				sum[Point{next.X, next.Y}] = 1
-
-				opp := Point{next.X + dx*2, next.Y + dy*2}
-				for {
-					if opp.X < len(grid.grid[0]) && opp.X >= 0 && opp.Y < len(grid.grid) && opp.Y >= 0 {
-						sum[opp] = 1
-					} else {
-						break
-					}
-					opp = Point{opp.X + dx, opp.Y + dy}
-				}
-			}
-		}
+	sum := 0
+	for i, v := range blocks {
+		val, _ := strconv.Atoi(v)
+		sum += i * val
 	}
-	grid.Print(sum)
-	return len(sum)
+
+	return sum
 }
