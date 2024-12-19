@@ -23,6 +23,11 @@ type Grid struct {
 	taken  map[Coord]int
 }
 
+var (
+	found = 0
+	end   = 0
+)
+
 var dir = [][]int{
 	{1, 0},
 	{-1, 0},
@@ -52,13 +57,18 @@ func (g Grid) Walk(x, y int) int {
 	if x < 0 || x >= len(g.grid[0]) || y < 0 || y >= len(g.grid) {
 		return 0
 	}
+	if found == end {
+		// fmt.Println("")
+		return 0
+	}
 
 	if g.grid[y][x].Val == 9 {
 		if _, ok := g.taken[Coord{x, y}]; ok {
 			return 0
 		}
+		found++
 		g.taken[Coord{x, y}] = 1
-		fmt.Println("found!", x, y)
+		// fmt.Println("found!", x, y)
 		return 1
 	}
 
@@ -104,6 +114,7 @@ func (g Grid) Print(inX, inY int) {
 func Parse(in string) Grid {
 	grid := [][]Point{}
 	starts := [][]int{}
+	ends := 0
 	for y, line := range strings.Split(in, "\n") {
 		chars := strings.Split(line, "")
 		nums := []Point{}
@@ -112,11 +123,15 @@ func Parse(in string) Grid {
 			if num == 0 {
 				starts = append(starts, []int{x, y})
 			}
+			if num == 9 {
+				ends++
+			}
 			nums = append(nums, Point{num, false})
 
 		}
 		grid = append(grid, nums)
 	}
+	end = ends
 	return Grid{grid, starts, make(map[Coord]int, 0)}
 }
 
@@ -138,6 +153,7 @@ func Day1(grid Grid) int {
 	for i, start := range grid.starts {
 		grid.taken = make(map[Coord]int, 0)
 		g := New(grid)
+		found = 0
 
 		v := g.Walk(start[0], start[1])
 		// fmt.Println(v)
