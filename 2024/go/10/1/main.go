@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Point struct {
 	Val     int
 	Visited bool
+	Coord
 }
 
 type Coord struct {
@@ -22,11 +22,6 @@ type Grid struct {
 	starts [][]int
 	taken  map[Coord]int
 }
-
-var (
-	found = 0
-	end   = 0
-)
 
 var dir = [][]int{
 	{1, 0},
@@ -57,37 +52,28 @@ func (g Grid) Walk(x, y int) int {
 	if x < 0 || x >= len(g.grid[0]) || y < 0 || y >= len(g.grid) {
 		return 0
 	}
-	if found == end {
-		// fmt.Println("")
-		return 0
-	}
 
 	if g.grid[y][x].Val == 9 {
 		if _, ok := g.taken[Coord{x, y}]; ok {
 			return 0
 		}
-		found++
+		// found++
 		g.taken[Coord{x, y}] = 1
-		// fmt.Println("found!", x, y)
 		return 1
 	}
 
 	sum := 0
 	if g.valid(x+dir[0][0], y+dir[0][1], x, y) {
-		gg := New(g)
-		sum += gg.Walk(x+dir[0][0], y+dir[0][1])
+		sum += g.Walk(x+dir[0][0], y+dir[0][1])
 	}
 	if g.valid(x+dir[1][0], y+dir[1][1], x, y) {
-		gg := New(g)
-		sum += gg.Walk(x+dir[1][0], y+dir[1][1])
+		sum += g.Walk(x+dir[1][0], y+dir[1][1])
 	}
 	if g.valid(x+dir[2][0], y+dir[2][1], x, y) {
-		gg := New(g)
-		sum += gg.Walk(x+dir[2][0], y+dir[2][1])
+		sum += g.Walk(x+dir[2][0], y+dir[2][1])
 	}
 	if g.valid(x+dir[3][0], y+dir[3][1], x, y) {
-		gg := New(g)
-		sum += gg.Walk(x+dir[3][0], y+dir[3][1])
+		sum += g.Walk(x+dir[3][0], y+dir[3][1])
 	}
 	// fmt.Println(sum)
 	return sum
@@ -114,7 +100,6 @@ func (g Grid) Print(inX, inY int) {
 func Parse(in string) Grid {
 	grid := [][]Point{}
 	starts := [][]int{}
-	ends := 0
 	for y, line := range strings.Split(in, "\n") {
 		chars := strings.Split(line, "")
 		nums := []Point{}
@@ -123,15 +108,11 @@ func Parse(in string) Grid {
 			if num == 0 {
 				starts = append(starts, []int{x, y})
 			}
-			if num == 9 {
-				ends++
-			}
-			nums = append(nums, Point{num, false})
+			nums = append(nums, Point{Val: num, Visited: false})
 
 		}
 		grid = append(grid, nums)
 	}
-	end = ends
 	return Grid{grid, starts, make(map[Coord]int, 0)}
 }
 
@@ -142,24 +123,20 @@ func New(g Grid) Grid {
 		copy(nextRow, row)
 		gr = append(gr, nextRow)
 	}
-	return Grid{grid: gr, taken: g.taken}
+	return Grid{grid: gr, taken: make(map[Coord]int, 0)}
 }
 
 func Day1(grid Grid) int {
 	sum := 0
-	// fmt.Println(len(grid.starts), grid.starts)
-	// grid.starts = [][]int{grid.starts[0]}
-	startTime := time.Now()
-	for i, start := range grid.starts {
-		grid.taken = make(map[Coord]int, 0)
+	for _, start := range grid.starts {
 		g := New(grid)
-		found = 0
+		grid.taken = make(map[Coord]int, 0)
 
 		v := g.Walk(start[0], start[1])
-		// fmt.Println(v)
 		sum += v
-		fmt.Println("%", len(grid.starts)/100*i, time.Since(startTime), len(grid.starts))
 	}
 
 	return sum
 }
+
+// too high: 28399
