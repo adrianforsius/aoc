@@ -7,11 +7,11 @@ import (
 )
 
 func TestDay1Example(t *testing.T) {
-	const expected = 36
+	const expected = 55312
 	assert.Equal(t, expected, Day1(Parse(exampleInput)))
 }
 
 func TestDay1(t *testing.T) {
-	const expected = 1324
+	const expected = 0
 	assert.Equal(t, expected, Day1(Parse(input)))
 }

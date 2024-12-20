@@ -7,8 +7,7 @@ import (
 )
 
 type Point struct {
-	Val     int
-	Visited bool
+	Val int
 	Coord
 }
 
@@ -18,9 +17,10 @@ type Coord struct {
 }
 
 type Grid struct {
-	grid   [][]Point
-	starts [][]int
-	taken  map[Coord]int
+	grid    [][]Point
+	starts  [][]int
+	visited map[Coord]int
+	// taken   map[Coord]int
 }
 
 var dir = [][]int{
@@ -34,7 +34,7 @@ func (g Grid) valid(x, y int, currX, currY int) bool {
 	if x < 0 || x >= len(g.grid[0]) || y < 0 || y >= len(g.grid) {
 		return false
 	}
-	if g.grid[y][x].Visited {
+	if _, ok := g.visited[Coord{X: x, Y: y}]; ok {
 		return false
 	}
 	if g.grid[y][x].Val > g.grid[currY][currX].Val+1 || g.grid[y][x].Val < g.grid[currY][currX].Val-1 {
@@ -48,19 +48,16 @@ func (g Grid) valid(x, y int, currX, currY int) bool {
 
 func (g Grid) Walk(x, y int) int {
 	// g.Print(x, y)
-	g.grid[y][x].Visited = true
-	if x < 0 || x >= len(g.grid[0]) || y < 0 || y >= len(g.grid) {
-		return 0
-	}
 
 	if g.grid[y][x].Val == 9 {
-		if _, ok := g.taken[Coord{x, y}]; ok {
+		if _, ok := g.visited[Coord{x, y}]; ok {
 			return 0
 		}
 		// found++
-		g.taken[Coord{x, y}] = 1
+		g.visited[Coord{X: x, Y: y}] = 1
 		return 1
 	}
+	g.visited[Coord{X: x, Y: y}] = 1
 
 	sum := 0
 	if g.valid(x+dir[0][0], y+dir[0][1], x, y) {
@@ -85,11 +82,7 @@ func (g Grid) Print(inX, inY int) {
 			if y == inY && x == inX {
 				fmt.Print("(" + fmt.Sprint(v.Val) + ")")
 			} else {
-				if v.Visited {
-					fmt.Print(" # ")
-				} else {
-					fmt.Print(" " + fmt.Sprint(v.Val) + " ")
-				}
+				fmt.Print(" " + fmt.Sprint(v.Val) + " ")
 			}
 		}
 		fmt.Println()
@@ -108,7 +101,7 @@ func Parse(in string) Grid {
 			if num == 0 {
 				starts = append(starts, []int{x, y})
 			}
-			nums = append(nums, Point{Val: num, Visited: false})
+			nums = append(nums, Point{Val: num})
 
 		}
 		grid = append(grid, nums)
@@ -123,17 +116,18 @@ func New(g Grid) Grid {
 		copy(nextRow, row)
 		gr = append(gr, nextRow)
 	}
-	return Grid{grid: gr, taken: make(map[Coord]int, 0)}
+	return Grid{grid: gr, visited: g.visited}
 }
 
 func Day1(grid Grid) int {
 	sum := 0
 	for _, start := range grid.starts {
 		g := New(grid)
-		grid.taken = make(map[Coord]int, 0)
 
 		v := g.Walk(start[0], start[1])
 		sum += v
+		grid.visited = make(map[Coord]int, 0)
+		fmt.Println(v, sum)
 	}
 
 	return sum
