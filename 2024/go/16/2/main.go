@@ -1,12 +1,17 @@
 package main
 
 import (
+	"container/heap"
 	"fmt"
+	"math"
 	"strings"
 )
 
 type Point struct {
-	Val string
+	Val       string
+	Direction Coord
+	Score     int
+	Path      []Coord
 	Coord
 }
 
@@ -15,39 +20,76 @@ type Coord struct {
 	Y int
 }
 
+type Heap []Point
+
+func (h Heap) Len() int            { return len(h) }
+func (h Heap) Less(i, j int) bool  { return h[i].Score < h[j].Score }
+func (h Heap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
+func (h *Heap) Push(x interface{}) { *h = append(*h, x.(Point)) }
+func (h *Heap) Pop() interface{} {
+	heap := *h
+	size := len(heap)
+	next := heap[size-1]
+	*h = heap[0 : size-1]
+	return next
+}
+
 type Grid struct {
-	grid   [][]Point
-	starts Point
-	moves  []string
+	grid  [][]Point
+	start Point
+	end   Point
 }
 
-var box = map[string]Coord{
-	"[": {1, 0},
-	"]": {-1, 0},
+var dir = []Coord{
+	{1, 0},
+	{-1, 0},
+	{0, 1},
+	{0, -1},
 }
 
-var opp = map[string]string{
-	"[": "]",
-	"]": "[",
+var (
+	NORTH = Coord{0, -1}
+	SOUTH = Coord{0, 1}
+	EAST  = Coord{1, 0}
+	WEST  = Coord{-1, 0}
+)
+
+func forward(c Coord) []Coord {
+	out := []Coord{}
+	for _, d := range dir {
+		if d.X+c.X == 0 && c.Y+d.Y == 0 {
+			continue
+		}
+		out = append(out, d)
+
+	}
+	return out
 }
 
-var dir = map[string]Coord{
-	">": {1, 0},
-	"<": {-1, 0},
-	"v": {0, 1},
-	"^": {0, -1},
+func (g Grid) Valid(c Coord) bool {
+	if c.X < 0 || c.X >= len(g.grid[0]) || c.Y < 0 || c.Y >= len(g.grid) {
+		return false
+	}
+	if g.Coord(c).Val == "#" {
+		return false
+	}
+	return true
 }
 
-func (g Grid) valid(c Coord) bool {
-	return c.X < 0 || c.X >= len(g.grid[0]) || c.Y < 0 || c.Y >= len(g.grid)
+func (g Grid) Coord(p Coord) Point {
+	return g.grid[p.Y][p.X]
 }
 
-func (g Grid) Coord(p Coord) string {
-	return g.grid[p.Y][p.X].Val
+func (g Grid) Set(p Point) {
+	g.grid[p.Y][p.X] = p
 }
 
-func (g Grid) Set(p Coord, v string) {
-	g.grid[p.Y][p.X].Val = v
+func (g Grid) Score(p Coord, score int) {
+	g.grid[p.Y][p.X].Score = score
+}
+
+func (g Grid) Direction(p Coord, dir Coord) {
+	g.grid[p.Y][p.X].Direction = dir
 }
 
 func Add(a, b Coord) Coord {
@@ -57,9 +99,18 @@ func Add(a, b Coord) Coord {
 	}
 }
 
-func (g Grid) Walk(x, y int) int {
-	sum := 0
-	return sum
+func (g Grid) PrintCoords(c map[Coord]int) {
+	for y, row := range g.grid {
+		for x, v := range row {
+			if _, ok := c[Coord{x, y}]; ok {
+				fmt.Print("(" + fmt.Sprint(v.Val) + ")")
+			} else {
+				fmt.Print(" " + fmt.Sprint(v.Val) + " ")
+			}
+		}
+		fmt.Println()
+	}
+	fmt.Println("=================")
 }
 
 func (g Grid) Print(c Coord) {
@@ -79,138 +130,94 @@ func (g Grid) Print(c Coord) {
 func Parse(in string) Grid {
 	grid := [][]Point{}
 
-	parts := strings.Split(in, "\n\n")
-	gridIn := parts[0]
-	movesIn := parts[1]
-	moves := strings.Split(strings.Join(strings.Split(movesIn, "\n"), ""), "")
 	start := Point{}
-	for y, line := range strings.Split(gridIn, "\n") {
+	end := Point{}
+	for y, line := range strings.Split(in, "\n") {
 		row := []Point{}
 		for x, char := range strings.Split(line, "") {
-			if char == "@" {
-				start = Point{Coord: Coord{X: x * 2, Y: y}, Val: char}
-				row = append(row, Point{Coord: Coord{X: x * 2, Y: y}, Val: "."})
-				row = append(row, Point{Coord: Coord{X: x*2 + 1, Y: y + 1}, Val: "."})
-				continue
+			if char == "S" {
+				start = Point{Coord: Coord{X: x, Y: y}, Val: char}
 			}
-			if char == "O" {
-				row = append(row, Point{Coord: Coord{X: x * 2, Y: y}, Val: "["})
-				row = append(row, Point{Coord: Coord{X: x*2 + 1, Y: y + 1}, Val: "]"})
-				continue
+			if char == "E" {
+				end = Point{Coord: Coord{X: x, Y: y}, Val: char}
 			}
-			row = append(row, Point{Coord: Coord{X: x * 2, Y: y}, Val: char})
-			row = append(row, Point{Coord: Coord{X: x*2 + 1, Y: y + 1}, Val: char})
-
+			row = append(row, Point{Coord: Coord{X: x, Y: y}, Val: char})
 		}
 		grid = append(grid, row)
 	}
-
-	g := Grid{grid, start, moves}
+	g := Grid{grid, start, end}
 	// g.Print(start.Coord)
 	return g
 }
 
 func Day2(grid Grid) int {
-	step := grid.starts.Coord
-	for i, moveChar := range grid.moves {
-		d := dir[moveChar]
-		next := Add(step, d)
-		// grid.Print(step)
-		fmt.Println("next", next, "d", d, "moveChar", moveChar, "step", step, "move", i)
-		if grid.Coord(next) == "#" {
-			continue
-		}
+	start := grid.start
+	score := math.MaxInt
+	start.Direction = Coord{1, 0}
+	start.Path = []Coord{start.Coord}
+	start.Score = 1
+	grid.Set(start)
 
-		if (grid.Coord(next) == "[" || grid.Coord(next) == "]") && (moveChar == "<" || moveChar == ">") {
-			checkNext := next
-			nexts := []Coord{}
-			move := true
-			for {
-				nexts = append(nexts, checkNext)
-				if grid.grid[checkNext.Y][checkNext.X].Val == "#" {
-					move = false
-					break
-				}
-				if grid.grid[checkNext.Y][checkNext.X].Val == "." {
-					break
-				}
-				checkNext = Add(checkNext, d)
-			}
-			if move {
-				grid.grid[nexts[0].Y][nexts[0].X].Val = "."
-				penUlti := grid.grid[nexts[len(nexts)-2].Y][nexts[len(nexts)-2].X].Val
-				grid.grid[nexts[len(nexts)-1].Y][nexts[len(nexts)-1].X].Val = penUlti
-				for i := 1; i < len(nexts)-1; i++ {
-					grid.grid[nexts[i].Y][nexts[i].X].Val = opp[grid.grid[nexts[i].Y][nexts[i].X].Val]
-				}
-				step = next
-			}
-			continue
-
-		}
-
-		if (grid.Coord(next) == "[" || grid.Coord(next) == "]") && (moveChar == "v" || moveChar == "^") {
-			list := map[Coord]string{}
-			d := dir[moveChar]
-			nexts := []Coord{next}
-			move := true
-			visited := map[Coord]int{}
-			for len(nexts) > 0 {
-				next := Coord{}
-				if len(nexts) == 1 {
-					next = nexts[0]
-					nexts = []Coord{}
-				} else {
-					next, nexts = nexts[0], nexts[1:]
-				}
-
-				if grid.Coord(next) == "#" {
-					move = false
-					break
-				}
-
-				if _, ok := visited[next]; ok {
-					continue
-				}
-				visited[next] = 1
-
-				if grid.Coord(next) == "." {
-					delete(list, next)
-					continue
-				}
-
-				pairDir := box[grid.Coord(next)]
-				pairNext := Add(next, pairDir)
-				nextNext := Add(next, d)
-				nexts = append(nexts, pairNext)
-				nexts = append(nexts, nextNext)
-				list[pairNext] = grid.Coord(pairNext)
-				list[nextNext] = grid.Coord(nextNext)
-			}
-
-			if move {
-				for l := range list {
-					grid.Set(l, ".")
-				}
-				for l, val := range list {
-					grid.Set(Add(l, d), val)
-				}
-				step = next
-			}
-			continue
-
-		}
-		step = next
+	type combo struct {
+		c   Coord
+		dir Coord
 	}
+	visited := map[combo]int{}
+	coords := map[Coord]int{}
 
-	sum := 0
-	for y, row := range grid.grid {
-		for x, c := range row {
-			if c.Val == "[" {
-				sum += (y * 100) + x
+	queue := &Heap{}
+	heap.Init(queue)
+	queue.Push(start)
+	for queue.Len() > 0 {
+		next := heap.Pop(queue).(Point)
+		if next.Score > score {
+			break
+		}
+
+		if scr, ok := visited[combo{next.Coord, next.Direction}]; ok && scr < next.Score {
+			continue
+		}
+		visited[combo{next.Coord, next.Direction}] = next.Score
+
+		if next.Val == "E" {
+			if next.Score < score {
+				score = next.Score
+			}
+			for _, p := range next.Path {
+				coords[p] = 1
+			}
+		}
+
+		prev := next
+		prevPath := prev.Path
+		for _, turn := range forward(prev.Direction) {
+			next := grid.Coord(Add(prev.Coord, turn))
+			// grid.Print(next.Coord)
+			if grid.Valid(next.Coord) {
+				newScore := prev.Score + 1
+				if prev.Direction != turn {
+					newScore += 1000
+				}
+
+				if next.Score == 0 || newScore < grid.Coord(next.Coord).Score {
+					// fmt.Println("add", newScore, score)
+					point := next
+					point.Score = newScore
+					point.Direction = turn
+					point.Path = append(append([]Coord{}, prevPath...), next.Coord)
+					// grid.Set(point)
+					// fmt.Println("point", point.Coord, prev.Coord)
+					// m := map[Coord]int{}
+					// for _, p := range point.Path {
+					// 	m[p] = 1
+					// }
+					// grid.PrintCoords(m)
+					heap.Push(queue, point)
+				}
 			}
 		}
 	}
+	// grid.PrintCoords(coords)
 
-	return sum
+	return len(coords)
 }
