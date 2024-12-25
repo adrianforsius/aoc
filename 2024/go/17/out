@@ -1,0 +1,105 @@
+=== RUN   TestDay1Example
+&{729 0 0 [0 1 5 4 3 0] 0 []}
+[]
+opp 0 operand 1 out []
+&main.Computer{A:729, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{}}
+[]
+opp 5 operand 4 out []
+&main.Computer{A:364, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{}}
+out 4
+[4]
+opp 3 operand 0 out [4]
+&main.Computer{A:364, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4}}
+[4]
+opp 0 operand 1 out [4]
+&main.Computer{A:364, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4}}
+[4]
+opp 5 operand 4 out [4]
+&main.Computer{A:182, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4}}
+out 6
+[4 6]
+opp 3 operand 0 out [4 6]
+&main.Computer{A:182, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6}}
+[4 6]
+opp 0 operand 1 out [4 6]
+&main.Computer{A:182, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6}}
+[4 6]
+opp 5 operand 4 out [4 6]
+&main.Computer{A:91, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6}}
+out 3
+[4 6 3]
+opp 3 operand 0 out [4 6 3]
+&main.Computer{A:91, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3}}
+[4 6 3]
+opp 0 operand 1 out [4 6 3]
+&main.Computer{A:91, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3}}
+[4 6 3]
+opp 5 operand 4 out [4 6 3]
+&main.Computer{A:45, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3}}
+out 5
+[4 6 3 5]
+opp 3 operand 0 out [4 6 3 5]
+&main.Computer{A:45, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5}}
+[4 6 3 5]
+opp 0 operand 1 out [4 6 3 5]
+&main.Computer{A:45, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3, 5}}
+[4 6 3 5]
+opp 5 operand 4 out [4 6 3 5]
+&main.Computer{A:22, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3, 5}}
+out 6
+[4 6 3 5 6]
+opp 3 operand 0 out [4 6 3 5 6]
+&main.Computer{A:22, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5, 6}}
+[4 6 3 5 6]
+opp 0 operand 1 out [4 6 3 5 6]
+&main.Computer{A:22, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3, 5, 6}}
+[4 6 3 5 6]
+opp 5 operand 4 out [4 6 3 5 6]
+&main.Computer{A:11, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3, 5, 6}}
+out 3
+[4 6 3 5 6 3]
+opp 3 operand 0 out [4 6 3 5 6 3]
+&main.Computer{A:11, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5, 6, 3}}
+[4 6 3 5 6 3]
+opp 0 operand 1 out [4 6 3 5 6 3]
+&main.Computer{A:11, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3, 5, 6, 3}}
+[4 6 3 5 6 3]
+opp 5 operand 4 out [4 6 3 5 6 3]
+&main.Computer{A:5, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3, 5, 6, 3}}
+out 5
+[4 6 3 5 6 3 5]
+opp 3 operand 0 out [4 6 3 5 6 3 5]
+&main.Computer{A:5, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5, 6, 3, 5}}
+[4 6 3 5 6 3 5]
+opp 0 operand 1 out [4 6 3 5 6 3 5]
+&main.Computer{A:5, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3, 5, 6, 3, 5}}
+[4 6 3 5 6 3 5]
+opp 5 operand 4 out [4 6 3 5 6 3 5]
+&main.Computer{A:2, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3, 5, 6, 3, 5}}
+out 2
+[4 6 3 5 6 3 5 2]
+opp 3 operand 0 out [4 6 3 5 6 3 5 2]
+&main.Computer{A:2, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5, 6, 3, 5, 2}}
+[4 6 3 5 6 3 5 2]
+opp 0 operand 1 out [4 6 3 5 6 3 5 2]
+&main.Computer{A:2, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3, 5, 6, 3, 5, 2}}
+[4 6 3 5 6 3 5 2]
+opp 5 operand 4 out [4 6 3 5 6 3 5 2]
+&main.Computer{A:1, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3, 5, 6, 3, 5, 2}}
+out 1
+[4 6 3 5 6 3 5 2 1]
+opp 3 operand 0 out [4 6 3 5 6 3 5 2 1]
+&main.Computer{A:1, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5, 6, 3, 5, 2, 1}}
+[4 6 3 5 6 3 5 2 1]
+opp 0 operand 1 out [4 6 3 5 6 3 5 2 1]
+&main.Computer{A:1, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:0, O:[]int{4, 6, 3, 5, 6, 3, 5, 2, 1}}
+[4 6 3 5 6 3 5 2 1]
+opp 5 operand 4 out [4 6 3 5 6 3 5 2 1]
+&main.Computer{A:0, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:2, O:[]int{4, 6, 3, 5, 6, 3, 5, 2, 1}}
+out 0
+[4 6 3 5 6 3 5 2 1 0]
+opp 3 operand 0 out [4 6 3 5 6 3 5 2 1 0]
+&main.Computer{A:0, B:0, C:0, Program:[]int{0, 1, 5, 4, 3, 0}, Pointer:4, O:[]int{4, 6, 3, 5, 6, 3, 5, 2, 1, 0}}
+--- PASS: TestDay1Example (0.00s)
+PASS
+ok  	github.com/adrianforsius/aoc/2024/go/17/1	0.004s
