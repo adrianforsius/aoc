@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -67,32 +66,19 @@ func Day1(d Design) int {
 				break
 			}
 
-			for {
-				changed := false
-				for i := next[1]; i > next[0]; i-- {
-					fmt.Println("next", next, "i", i, "part", design[next[0]:i])
-					if _, ok := d.patterns[design[next[0]:i]]; ok {
-						queue.Append([]int{i, min(next[0]+d.maxLength, len(design))})
-						changed = true
-						break
-					}
-				}
-				if !changed {
-					next[1]--
-				}
-				if next[1] == next[0] {
-					break
+			for i := next[1]; i > next[0]; i-- {
+				// fmt.Println("next", next, "i", i, "part", design[next[0]:i])
+				if _, ok := d.patterns[design[next[0]:i]]; ok {
+					queue.Append([]int{i, min(next[0]+d.maxLength, len(design))})
 				}
 			}
 
 			q := *queue
 			if len(q) == 0 {
-				fmt.Println("empty quueu")
 				break
 			}
 
 			if queue.Peek()[0] == len(design) {
-				fmt.Println("found")
 				sum++
 				break
 			}
