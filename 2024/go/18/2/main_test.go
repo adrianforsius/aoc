@@ -6,17 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDay2Example(t *testing.T) {
-	const expected = 45
-	assert.Equal(t, expected, Day2(Parse(exampleInput)))
-}
-
-func TestDay2Example2(t *testing.T) {
-	const expected = 64
-	assert.Equal(t, expected, Day2(Parse(exampleInput2)))
-}
+// func TestDay2Example(t *testing.T) {
+// 	const expected = "6,1"
+// 	assert.Equal(t, expected, Day2(Parse(exampleInput, 6)))
+// }
 
 func TestDay2(t *testing.T) {
-	const expected = 0
-	assert.Equal(t, expected, Day2(Parse(input)))
+	const expected = ""
+	assert.Equal(t, expected, Day2(Parse(input, 70)))
 }
