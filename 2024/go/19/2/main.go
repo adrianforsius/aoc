@@ -1,80 +1,58 @@
 package main
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 )
 
-func Parse(in string) []int {
-	line := []int{}
-	for _, char := range strings.Split(in, " ") {
-		num, _ := strconv.Atoi(char)
-		line = append(line, num)
-	}
-	return line
+type Design struct {
+	patterns  map[string]string
+	display   []string
+	maxLength int
 }
 
-func Day2(stones []int, blinks int) int {
-	vals := map[int]int{}
-	for _, s := range stones {
-		vals[s]++
+func Parse(in string) Design {
+	parts := strings.Split(in, "\n\n")
+	patterns := map[string]string{}
+	for _, s := range strings.Split(parts[0], ", ") {
+		patterns[s] = s
 	}
 
-	for i := 0; i < blinks; i++ {
-		vals = NewStones(vals)
+	display := strings.Split(parts[1], "\n")
+	maxLength := len(display[0])
+	for _, d := range display {
+		maxLength = max(maxLength, len(d))
 	}
 
-	out := 0
-	for _, count := range vals {
-		out += count
-	}
-
-	return out
+	return Design{patterns, display, maxLength}
 }
 
-var lookup = map[int][]int{
-	0: {1},
-	1: {2024},
-}
+func Day2(d Design) int {
+	sum := 0
+	cache := map[string]int{}
 
-func NewStones(c map[int]int) map[int]int {
-	cache := map[int]int{}
-	for i, v := range c {
-		if next, ok := lookup[i]; ok {
-			for _, n := range next {
-				cache[n] += v
-			}
-			continue
+	var search func(string) int
+	search = func(s string) int {
+		if len(s) == 0 {
+			return 1
+		}
+		if v, ok := cache[s]; ok {
+			return v
 		}
 
-		if len(strconv.Itoa(i))%2 == 0 {
-			sStr := strconv.Itoa(i)
-			first, last := sStr[:len(sStr)/2], sStr[len(sStr)/2:]
-			firstNum, lastNum := 0, 0
-			for i, f := range first {
-				if string(f) != "0" {
-					firstNum, _ = strconv.Atoi(first[i:])
-					break
-				}
+		out := 0
+		for _, pattern := range d.patterns {
+			if strings.HasPrefix(s, pattern) {
+				temp := search(s[len(pattern):])
+				cache[s[len(pattern):]] = temp
+				out += temp
 			}
-			for i, f := range last {
-				if string(f) != "0" {
-					lastNum, _ = strconv.Atoi(last[i:])
-					break
-				}
-			}
-			cache[firstNum] += v
-			cache[lastNum] += v
-			lookup[i] = []int{firstNum, lastNum}
-			continue
 		}
-
-		val := i * 2024
-		cache[val] += v
-		lookup[i] = []int{val}
+		return out
 	}
-	fmt.Println("cache", cache)
 
-	return cache
+	for _, design := range d.display {
+		sum += search(design)
+	}
+
+	return sum
 }
