@@ -1,0 +1,48 @@
+=== RUN   TestDay1Example
+next [0 6] i 5 part brwrr
+next [0 6] i 4 part brwr
+next [0 6] i 3 part brw
+next [0 6] i 2 part br
+next [0 6] i 4 part bggr
+next [0 6] i 3 part bgg
+next [0 6] i 2 part bg
+next [0 6] i 1 part b
+next [0 6] i 4 part gbbr
+next [0 6] i 3 part gbb
+next [0 6] i 2 part gb
+next [0 6] i 6 part rrbgbr
+next [0 6] i 5 part rrbgb
+next [0 6] i 4 part rrbg
+next [0 6] i 3 part rrb
+next [0 6] i 2 part rr
+next [0 6] i 1 part r
+found
+next [0 6] i 4 part ubwu
+next [0 6] i 3 part ubw
+next [0 6] i 2 part ub
+next [0 6] i 1 part u
+next [0 6] i 6 part bwurrg
+next [0 6] i 5 part bwurr
+next [0 6] i 4 part bwur
+next [0 6] i 3 part bwu
+found
+next [0 6] i 4 part brgr
+next [0 6] i 3 part brg
+next [0 6] i 2 part br
+next [0 6] i 6 part bbrgwb
+next [0 6] i 5 part bbrgw
+next [0 6] i 4 part bbrg
+next [0 6] i 3 part bbr
+next [0 6] i 2 part bb
+next [0 6] i 1 part b
+found
+    main_test.go:11: 
+        	Error Trace:	/home/adrianforsius/src/github.com/adrianforsius/aoc/2024/go/19/1/main_test.go:11
+        	Error:      	Not equal: 
+        	            	expected: 6
+        	            	actual  : 3
+        	Test:       	TestDay1Example
+--- FAIL: TestDay1Example (0.00s)
+FAIL
+FAIL	github.com/adrianforsius/aoc/2024/go/19/1	0.002s
+FAIL
