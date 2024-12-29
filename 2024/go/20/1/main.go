@@ -154,7 +154,6 @@ func Parse(in string) Grid {
 	}
 	g := Grid{grid, start, end}
 
-	fmt.Println(end)
 	return g
 }
 
@@ -167,13 +166,13 @@ func diff(a, b int) int {
 
 func Day1(grid Grid) int {
 	start := grid.start
+	start.Path = []CheatCheck{{Coord: start.Coord, Direction: start.Direction, Score: 0}}
 
 	queue := &Heap{}
 	heap.Init(queue)
 	queue.Push(start)
 	visited := map[Coord]int{}
 	base := Point{}
-	// cheatChecks := []CheatCheck{}
 	for queue.Len() > 0 {
 		next := heap.Pop(queue).(Point)
 		if next.Val == "E" {
@@ -192,11 +191,10 @@ func Day1(grid Grid) int {
 			if grid.Valid(nextCoord) {
 				next := grid.Coord(nextCoord)
 				if next.Val == "#" {
-					// cheatChecks = append(cheatChecks, CheatCheck{Coord: next.Coord, Direction: turn, Score: newScore})
 					continue
 				}
-				next.Path = append(append([]CheatCheck{}, prev.Path...), CheatCheck{Coord: next.Coord, Direction: next.Direction, Score: next.Score})
 				newScore := prev.Score + 1
+				next.Path = append(append([]CheatCheck{}, prev.Path...), CheatCheck{Coord: next.Coord, Direction: next.Direction, Score: newScore})
 				next.Score = newScore
 				next.Direction = turn
 				heap.Push(queue, next)
@@ -212,16 +210,14 @@ func Day1(grid Grid) int {
 		pathMap[b.Coord] = b
 		for _, side := range dir {
 			next := grid.Coord(Add(b.Coord, side))
-			if next.Val == "#" {
+			if _, ok := wallMap[next.Coord]; !ok && next.Val == "#" {
 				wallMap[next.Coord] = CheatCheck{Direction: side, Score: b.Score + 1, Coord: next.Coord}
 			}
 		}
-		// fmt.Println("b", b.Coord, b.Score)
 	}
-	fmt.Println("wallMap", len(wallMap))
-	fmt.Println("pathMap", len(pathMap))
-	grid.PrintMap(wallMap)
-	grid.PrintMap(pathMap)
+
+	// fmt.Println("wallMap", len(wallMap))
+	// fmt.Println("pathMap", len(pathMap))
 
 	sum := 0
 	for _, check := range wallMap {
@@ -236,27 +232,15 @@ func Day1(grid Grid) int {
 			}
 			visited[next.Coord] = 1
 
-			// if check.Score+100+diff(grid.end.X, next.X)+diff(grid.end.Y, next.Y) > base.Score {
-			//
-			// 	continue
-			// }
-			// if check.Score+100 > base.Score {
-			// 	continue
-			// }
-
 			if v, ok := pathMap[next.Coord]; ok {
-				// fmt.Println("diff", base.Score-v.Score, "next", next.Score, "wall", v.Score, "total", base.Score-v.Score+next.Score)
-				if base.Score-v.Score+next.Score <= base.Score-100 {
-					if sum%100 == 0 {
-						fmt.Println("found 100 cheat")
-					}
-					if sum%1000 == 0 {
-						fmt.Println("found 1000 cheat")
-					}
-					sum++
-					break
+				if v.Score <= next.Score {
+					continue
 				}
-				continue
+				if v.Score-next.Score >= 100 {
+					sum++
+				}
+
+				break
 			}
 
 			prev := next
@@ -268,7 +252,6 @@ func Day1(grid Grid) int {
 						continue
 					}
 
-					next.Direction = turn
 					next.Score = prev.Score + 1
 					heap.Push(queue, next)
 				}
@@ -276,11 +259,16 @@ func Day1(grid Grid) int {
 		}
 	}
 
+	// grid.PrintMap(pathMap)
+	// grid.PrintMap(wallMap)
+	// fmt.Println(cheats)
+
 	// out := 0
 	// for sec := range cheatSheet {
 	// 	if base-sec >= 100 {
 	// 		out++
 	// 	}
 	// }
+	// fmt.Println(sum)
 	return sum
 }
