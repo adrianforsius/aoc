@@ -218,6 +218,7 @@ func Day1(grid Grid) int {
 
 	// fmt.Println("wallMap", len(wallMap))
 	// fmt.Println("pathMap", len(pathMap))
+	cheats := map[int]int{}
 
 	sum := 0
 	for _, check := range wallMap {
