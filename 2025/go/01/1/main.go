@@ -22,7 +22,7 @@ func Parse(in []byte) ([]int, []int) {
 	return left, right
 }
 
-func Day1(left, right []int) int {
+func Puzzle(left, right []int) int {
 	sort.Slice(left, func(i, j int) bool {
 		return left[i] > left[j]
 	})

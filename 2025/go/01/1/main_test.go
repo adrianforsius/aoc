@@ -33,10 +33,10 @@ func Example() []byte {
 
 func TestDay1Example(t *testing.T) {
 	const expected = 11
-	assert.Equal(t, expected, Day1(Parse(Example())))
+	assert.Equal(t, expected, Puzzle(Parse(Example())))
 }
 
 func TestDay1(t *testing.T) {
 	const expected = 1879048
-	assert.Equal(t, expected, Day1(Parse(Input())))
+	assert.Equal(t, expected, Puzzle(Parse(Input())))
 }

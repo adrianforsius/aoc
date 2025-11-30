@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -42,6 +43,7 @@ func Day2(d Design) int {
 		out := 0
 		for _, pattern := range d.patterns {
 			if strings.HasPrefix(s, pattern) {
+				fmt.Println(s, len(s), len(pattern), pattern, "next", len(s[len(pattern):]))
 				temp := search(s[len(pattern):])
 				cache[s[len(pattern):]] = temp
 				out += temp
