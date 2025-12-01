@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"strconv"
 	"strings"
 )
@@ -20,18 +21,25 @@ func Puzzle(in [][]string) int {
 	dial := 50
 	for _, i := range in {
 		val, _ := strconv.Atoi(i[1])
+		before := dial
+
 		if i[0] == "L" {
 			dial -= val
+			dial = dial % 100
+			if dial < 0 {
+				dial += 100
+			}
+			if dial > before && before != 0 || dial == 0 {
+				sum++
+			}
 		} else {
 			dial += val
+			dial = dial % 100
+			if dial < before {
+				sum++
+			}
 		}
-		dial = dial % 100
-		if dial < 0 {
-			dial += 100
-		}
-		if dial == 0 {
-			sum++
-		}
+		sum += int(math.Trunc(float64(val) / 100))
 	}
 	return sum
 }

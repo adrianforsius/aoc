@@ -31,12 +31,12 @@ func Example() []byte {
 	return contents
 }
 
-func TestDay1Example(t *testing.T) {
-	const expected = 3
+func TestExample(t *testing.T) {
+	const expected = 6
 	assert.Equal(t, expected, Puzzle(Parse(Example())))
 }
 
-func TestDay1(t *testing.T) {
-	const expected = 1158
+func TestInput(t *testing.T) {
+	const expected = 6860
 	assert.Equal(t, expected, Puzzle(Parse(Input())))
 }
