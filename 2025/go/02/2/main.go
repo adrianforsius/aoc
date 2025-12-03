@@ -1,45 +1,53 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
 )
 
-func Parse(in []byte) [][]string {
-	lines := strings.Split(string(in), "\n")
-	lines = lines[:len(lines)-1]
-	out := [][]string{}
-	for _, line := range lines {
-		out = append(out, []string{string(line[0]), string(line[1:])})
+func Parse(in []byte) [][]int {
+
+	str := strings.TrimSpace(string(in))
+	ranges := strings.Split(str, ",")
+	out := [][]int{}
+	for _, rs := range ranges {
+		parts := strings.Split(rs, "-")
+		start, _ := strconv.Atoi(parts[0])
+		end, _ := strconv.Atoi(parts[1])
+		out = append(out, []int{start, end})
 	}
 	return out
 }
 
-func Puzzle(in [][]string) int {
+func Puzzle(in [][]int) int {
 	sum := 0
-	dial := 50
-	for _, i := range in {
-		val, _ := strconv.Atoi(i[1])
-		before := dial
+	for _, set := range in {
+		for i := set[0]; i <= set[1]; i++ {
+			val := fmt.Sprint(i)
 
-		if i[0] == "L" {
-			dial -= val
-			dial = dial % 100
-			if dial < 0 {
-				dial += 100
-			}
-			if dial > before && before != 0 || dial == 0 {
-				sum++
-			}
-		} else {
-			dial += val
-			dial = dial % 100
-			if dial < before {
-				sum++
+			for j := 1; j <= int(math.Trunc(float64(len(val)/2))); j++ {
+				if len(val)%j != 0 {
+					continue
+				}
+
+				parts := len(val) / j
+				hit := true
+				first := val[0:j]
+				for e := 1; e < parts; e++ {
+					if val[j*e:j+e*j] != first {
+						hit = false
+						break
+					}
+				}
+				if hit {
+					sum += i
+					break
+				}
+
 			}
 		}
-		sum += int(math.Trunc(float64(val) / 100))
 	}
 	return sum
 }

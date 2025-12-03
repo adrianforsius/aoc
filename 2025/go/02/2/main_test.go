@@ -32,11 +32,11 @@ func Example() []byte {
 }
 
 func TestExample(t *testing.T) {
-	const expected = 6
+	const expected = 4174379265
 	assert.Equal(t, expected, Puzzle(Parse(Example())))
 }
 
 func TestInput(t *testing.T) {
-	const expected = 6860
+	const expected = 0
 	assert.Equal(t, expected, Puzzle(Parse(Input())))
 }

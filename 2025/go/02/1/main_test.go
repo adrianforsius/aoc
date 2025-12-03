@@ -37,6 +37,6 @@ func TestExample(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
-	const expected = 38_416_786_900 // too low
+	const expected = 38437576669 // too low
 	assert.Equal(t, expected, Puzzle(Parse(Input())))
 }
